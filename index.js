@@ -5,7 +5,8 @@ const token = '6940538154:AAHva2agTSA87Kear1shOv5xIfo4-HkSKPc'
 
 const bot = new TelegramBot(token, { polling: true })
 
-const webAppUrl = 'https://stirring-salmiakki-f50182.netlify.app'
+// const webAppUrl = 'https://stirring-salmiakki-f50182.netlify.app'  - netlify static(refresh after push changes on github)
+const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app/'
 const app = express()
 
 app.use(express.json())
