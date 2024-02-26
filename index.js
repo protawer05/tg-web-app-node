@@ -1,12 +1,12 @@
-import TelegramBot from 'node-telegram-bot-api'
-import express from 'express'
 import cors from 'cors'
+import express from 'express'
+import TelegramBot from 'node-telegram-bot-api'
 const token = '6940538154:AAHva2agTSA87Kear1shOv5xIfo4-HkSKPc'
 
 const bot = new TelegramBot(token, { polling: true })
 
-// const webAppUrl = 'https://stirring-salmiakki-f50182.netlify.app'  - netlify static(refresh after push changes on github)
-const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app/'
+// const webAppUrl = 'https://stirring-salmiakki-f50182.netlify.app'  - netlify static(for production)
+const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app/' // - ngrok dynamic(for testing)
 const app = express()
 
 app.use(express.json())
@@ -18,12 +18,16 @@ bot.on('message', async msg => {
 	if (text === '/start') {
 		await bot.sendMessage(chatId, 'Заполните форму', {
 			reply_markup: {
-				keyboard: [[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]],
+				keyboard: [
+					[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }],
+				],
 			},
 		})
 		await bot.sendMessage(chatId, 'Ниже появится кнопка входа', {
 			reply_markup: {
-				inline_keyboard: [[{ text: 'Зайти в интернет-магазин', web_app: { url: webAppUrl } }]],
+				inline_keyboard: [
+					[{ text: 'Зайти в интернет-магазин', web_app: { url: webAppUrl } }],
+				],
 			},
 		})
 	}
@@ -48,11 +52,12 @@ app.post('/web-data', async (req, res) => {
 			type: 'article',
 			id: queryId,
 			title: 'Успешная покупка',
-			input_message_content: { message_text: `Поздравляю с покупкой вы приобрели товар на сумму: ${totalPrice}$` },
+			input_message_content: {
+				message_text: `Поздравляю с покупкой вы приобрели товар на сумму: ${totalPrice}$`,
+			},
 		})
 		res.status(200).json({})
 	} catch (err) {
-		console.log(err)
 		await bot.answerWebAppQuery(queryId, {
 			type: 'article',
 			id: queryId,
