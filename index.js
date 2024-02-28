@@ -1,17 +1,26 @@
 import cors from 'cors'
 import express from 'express'
+import mongoose from 'mongoose'
 import TelegramBot from 'node-telegram-bot-api'
+import {
+	getProducts,
+	postProduct,
+	removeProduct,
+} from './controller/ProductController.js'
 const token = '6940538154:AAHva2agTSA87Kear1shOv5xIfo4-HkSKPc'
 
 const bot = new TelegramBot(token, { polling: true })
 
-// const webAppUrl = 'https://stirring-salmiakki-f50182.netlify.app'  - netlify static(for production)
+//const webAppUrl = 'https://strong-mousse-d4d1c0.netlify.app' //- netlify static(for production)
 const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app/' // - ngrok dynamic(for testing)
+// перед продакшен не забыть изменить в botfather копку /setmenubutton
 const app = express()
 
 app.use(express.json())
 app.use(cors())
-
+const DBURL =
+	'mongodb+srv://artemverk05:qqQQ220767@nikita-shop.hvg5uv7.mongodb.net/?retryWrites=true&w=majority&appName=nikita-shop'
+mongoose.connect(DBURL).then(() => console.log('db is ok'))
 bot.on('message', async msg => {
 	const chatId = msg.chat.id
 	const text = msg.text
@@ -45,6 +54,7 @@ bot.on('message', async msg => {
 		}
 	}
 })
+
 app.post('/web-data', async (req, res) => {
 	const { queryId, products, totalPrice } = req.body
 	try {
@@ -67,5 +77,8 @@ app.post('/web-data', async (req, res) => {
 		res.status(500).json({})
 	}
 })
+app.post('/products', postProduct)
+app.delete('/products/:id', removeProduct)
+app.get('/products', getProducts)
 const PORT = 8000
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`))
