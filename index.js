@@ -12,7 +12,7 @@ const token = '6940538154:AAHva2agTSA87Kear1shOv5xIfo4-HkSKPc'
 const bot = new TelegramBot(token, { polling: true })
 
 //const webAppUrl = 'https://strong-mousse-d4d1c0.netlify.app' //- netlify static(for production)
-const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app/' // - ngrok dynamic(for testing)
+const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app' // - ngrok dynamic(for testing)
 // перед продакшен не забыть изменить в botfather копку /setmenubutton
 const app = express()
 
@@ -25,17 +25,23 @@ bot.on('message', async msg => {
 	const chatId = msg.chat.id
 	const text = msg.text
 	if (text === '/start') {
-		await bot.sendMessage(chatId, 'Заполните форму', {
-			reply_markup: {
-				keyboard: [
-					[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }],
-				],
-			},
-		})
 		await bot.sendMessage(chatId, 'Ниже появится кнопка входа', {
 			reply_markup: {
 				inline_keyboard: [
 					[{ text: 'Зайти в интернет-магазин', web_app: { url: webAppUrl } }],
+				],
+			},
+		})
+	} else if (text === '/admin') {
+		await bot.sendMessage(chatId, 'Вот ваша страница админ панели:', {
+			reply_markup: {
+				inline_keyboard: [
+					[
+						{
+							text: 'Зайти в админ панель',
+							web_app: { url: webAppUrl + '/admin' },
+						},
+					],
 				],
 			},
 		})
@@ -56,7 +62,7 @@ bot.on('message', async msg => {
 })
 
 app.post('/web-data', async (req, res) => {
-	const { queryId, products, totalPrice } = req.body
+	const { queryId, totalPrice } = req.body
 	try {
 		await bot.answerWebAppQuery(queryId, {
 			type: 'article',
