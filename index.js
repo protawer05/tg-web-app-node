@@ -11,7 +11,7 @@ const token = '6940538154:AAHva2agTSA87Kear1shOv5xIfo4-HkSKPc'
 
 const bot = new TelegramBot(token, { polling: true })
 
-//const webAppUrl = 'https://strong-mousse-d4d1c0.netlify.app' //- netlify static(for production)
+// const webAppUrl = 'https://strong-mousse-d4d1c0.netlify.app' //- netlify static(for production)
 const webAppUrl = 'https://fly-deciding-ray.ngrok-free.app' // - ngrok dynamic(for testing)
 // перед продакшен не забыть изменить в botfather копку /setmenubutton
 const app = express()
@@ -46,30 +46,22 @@ bot.on('message', async msg => {
 			},
 		})
 	}
-	if (msg?.web_app_data?.data) {
-		try {
-			const data = JSON.parse(msg?.web_app_data?.data)
-
-			await bot.sendMessage(chatId, `Страна: ${data.country}`)
-			await bot.sendMessage(chatId, `Улица: ${data.street}`)
-			setTimeout(async () => {
-				await bot.sendMessage(chatId, 'Спасибо за обратную связь')
-			}, 3000)
-		} catch (e) {
-			console.log(e)
-		}
-	}
 })
 
 app.post('/web-data', async (req, res) => {
-	const { queryId, totalPrice } = req.body
+	const { queryId, totalPrice, products } = req.body
+	let messageText = 'Поздравляю с покупкой, вы приобрели товар: \n'
+	products.forEach((obj, i) => {
+		messageText += `${i + 1}) ${obj.title} x${obj.counter}\n`
+	})
+	messageText += `На сумму ${totalPrice}₽`
 	try {
 		await bot.answerWebAppQuery(queryId, {
 			type: 'article',
 			id: queryId,
 			title: 'Успешная покупка',
 			input_message_content: {
-				message_text: `Поздравляю с покупкой вы приобрели товар на сумму: ${totalPrice}$`,
+				message_text: messageText,
 			},
 		})
 		res.status(200).json({})
